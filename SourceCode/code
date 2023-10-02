@@ -1,0 +1,305 @@
+#include<SoftwareSerial.h>
+#include <ESP8266WiFi.h>
+#include <FirebaseArduino.h>
+#include <Wire.h> 
+#include <LiquidCrystal_I2C.h>
+ 
+#define FIREBASE_HOST "ktrmrfidtrally-default-rtdb.firebaseio.com"
+#define WIFI_SSID "poweriot"
+#define WIFI_PASSWORD "poweriot01"
+ 
+SoftwareSerial rfid(D5,D6);      //  0A001D78254A, 0A001F82F562,  0A001F8322B4
+ 
+int i;                                          // count = 0
+char input[12];
+unsigned char ks=0,i1=1,i2=1,i3=1,i4=1;
+unsigned int count,item_1=40,item_2=20,item_3=30,item_4=5,cost=0,initial=0;
+int i1_v,i2_v,i3_v,i4_v,f_v,f1_v;
+void setup()
+{
+ Serial.begin(9600);
+rfid.begin(9600);
+  lcd.begin();
+ lcd.clear();
+lcd.print("SMART TROLLEY");
+lcd.setCursor(0,1);
+lcd.print("   WELCOME");
+delay(2000);
+WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+    Serial.print("Connecting");
+    while(WiFi.status() != WL_CONNECTED){
+        Serial.print(".");
+        delay(500);
+      }
+      Serial.println();
+      Serial.print("connected: ");
+      Serial.println(WiFi.localIP());
+      Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
+      lcd.clear();
+      lcd.setCursor(0,0);
+      lcd.print("I:");
+      lcd.setCursor(11,0);
+      lcd.print("C:");
+      lcd.setCursor(0,1);
+      lcd.print("N.I:");
+      lcd.setCursor(11,1);
+      lcd.print("T.C");
+}
+void loop()
+{
+   if(Firebase.failed()){
+       Serial.print("Firebase error");
+       Serial.println(Firebase.error());
+     }
+if(rfid.available())
+{  
+  i = 0;
+      while((rfid.available()) && (i < 12))          // Read 12 characters and store them in input array
+      {
+         input[i] = rfid.read();
+         i++;
+         delay(5);
+      }
+      input[i]='\0';
+Serial.println(input);
+if(compare(input,"5300AA02609B")) 
+{
+  f1_v=0;
+  f_v=0;
+  i1++;
+ if((i1%2))
+  {
+    if(i1_v>0)
+    i1_v--;
+cost=cost-item_1;
+count=count-1;
+  }   
+  if(!(i1%2))
+  {
+    i1_v++;
+cost=cost+item_1;
+count=count+1;
+  }
+lcd.setCursor(0,0);
+lcd.print("I:");
+lcd.setCursor(2,0);
+lcd.print("ITEM_1 ");
+ lcd.setCursor(11,0);
+lcd.print("C:");
+ lcd.setCursor(13,0);
+  lcd.print(item_1);
+// lcd.print((item_1/10)%10+48);
+// lcd.print(item_1%10+48);
+lcd.setCursor(0,1);
+lcd.print("N.I:");
+lcd.setCursor(4,1);
+lcd.print(count);
+//  lcd.print((count/10)%10+48);
+//lcd.print(count%10+48); 
+  lcd.setCursor(8,1);
+ lcd.print("T.C:");
+ lcd.setCursor(12,1);
+lcd.print(cost);
+//lcd.print((cost/10)%10+48);
+//lcd.print(cost%10+48);
+}
+if(compare(input,"5400C550BA7B")) 
+{
+  f_v=0;
+  f1_v=0;
+  i2++;
+ if((i2%2))
+  {
+    if(i2_v>0)
+    i2_v--;
+   cost=cost-item_2;
+   count=count-1;
+ }   
+  if(!(i2%2))
+  {
+i2_v++;
+cost=cost+item_2;
+count=count+1;
+  }
+lcd.setCursor(0,0);
+lcd.print("I:");
+lcd.setCursor(2,0);
+lcd.print("ITEM_2 ");
+lcd.setCursor(11,0);
+lcd.print("C:");
+lcd.setCursor(13,0);
+ lcd.print(item_2);
+//lcd.print((item_2/10)%10+48);
+//lcd.print(item_2%10+48);
+lcd.setCursor(0,1);
+lcd.print("N.I:");
+lcd.setCursor(4,1);
+lcd.print(count);
+//  lcd.print((count/10)%10+48); //lcd.print(count%10+48); 
+ lcd.setCursor(8,1);
+lcd.print("T.C:");
+lcd.setCursor(12,1);
+lcd.print(cost);
+//lcd.print((cost/10)%10+48);
+//lcd.print(cost%10+48);
+}
+if(compare(input,"5400C5653ACE")) 
+{
+  f_v=0;
+  f1_v=0;
+  i3++;
+ 
+  if((i3%2))
+  {
+    if(i3_v>0)
+    i3_v--;
+cost=cost-item_3;
+count=count-1;
+  }   
+  if(!(i3%2))
+  {
+    i3_v++;
+cost=cost+item_3;
+count=count+1;
+  }
+ lcd.setCursor(0,0);
+lcd.print("I:");
+lcd.setCursor(2,0);
+lcd.print("ITEM_3 ");
+lcd.setCursor(11,0);
+lcd.print("C:");
+ lcd.setCursor(13,0);
+lcd.print(item_3);
+//lcd.print((item_3/10)%10+48); //lcd.print(item_3%10+48);
+lcd.setCursor(0,1);
+lcd.print("N.I:");
+lcd.setCursor(4,1);
+lcd.print(count);
+//lcd.print((count/10)%10+48); //lcd.print(count%10+48); 
+  lcd.setCursor(8,1);
+  lcd.print("T.C:");
+  lcd.setCursor(12,1);
+ lcd.print(cost);
+//lcd.print((cost/10)%10+48);  //lcd.print(cost%10+48);
+}
+if(compare(input,"5300A9E8BAA8")) 
+{
+  f_v=0;
+  f1_v=0;
+  i4++;
+ if((i4%2))
+  {
+        if(i4_v>0)
+    i4_v--;
+cost=cost-item_4;
+count=count-1;
+  }   
+  if(!(i4%2))
+  {
+    i3_v++;
+cost=cost+item_4;
+count=count+1;
+  }
+lcd.setCursor(0,0);
+lcd.print("I:");
+lcd.setCursor(2,0);
+lcd.print("ITEM_4 ");
+lcd.setCursor(11,0);
+lcd.print("C:");
+ lcd.setCursor(13,0);
+lcd.print(item_4);
+//lcd.print((item_3/10)%10+48); //lcd.print(item_3%10+48);
+lcd.setCursor(0,1);
+lcd.print("N.I:");
+lcd.setCursor(4,1);
+lcd.print(count);
+//lcd.print((count/10)%10+48); //lcd.print(count%10+48); 
+lcd.setCursor(8,1);
+lcd.print("T.C:");
+lcd.setCursor(12,1);
+ lcd.print(cost);
+//lcd.print((cost/10)%10+48); //lcd.print(cost%10+48);
+}
+if(compare(input,"5300A9D9C8EB")) 
+{
+  if(f_v==0)
+  {
+Firebase.setFloat ("RFID_TROLLEY/ITEM1",i1_v);
+Firebase.setFloat ("RFID_TROLLEY/ITEM2",i2_v);
+Firebase.setFloat ("RFID_TROLLEY/ITEM3",i3_v);
+Firebase.setFloat ("RFID_TROLLEY/ITEM4",i4_v);
+  }
+  if(f1_v==0)
+  {
+Firebase.setFloat ("RFID_TROLLEY_CUSTOMER/ITEM1",i1_v);
+Firebase.setFloat ("RFID_TROLLEY_CUSTOMER/ITEM2",i2_v);
+Firebase.setFloat ("RFID_TROLLEY_CUSTOMER/ITEM3",i3_v);
+Firebase.setFloat ("RFID_TROLLEY_CUSTOMER/ITEM4",i4_v); }  
+ f_v++;
+ f1_v++;
+  i1=i2=i3=1;
+cost=0,count=0;
+ i1_v=i2_v=i3_v=i4_v=0;
+lcd.setCursor(0,0);
+lcd.print("I:");
+lcd.setCursor(2,0);
+lcd.print("ITEM  ");
+lcd.setCursor(11,0);
+lcd.print("C:");
+lcd.setCursor(13,0);
+lcd.print(initial);
+//lcd.print((initial/10)%10+48); //lcd.print(initial%10+48);
+lcd.setCursor(0,1);
+lcd.print("N.I:");
+lcd.setCursor(4,1);
+lcd.print(count);
+//  lcd.print((count/10)%10+48); //lcd.print(count%10+48); 
+lcd.setCursor(8,1);
+lcd.print("T.C:");
+lcd.setCursor(12,1);
+lcd.print(cost);
+//lcd.print((cost/10)%10+48); //lcd.print(cost%10+48);
+delay(1000);
+lcd.clear();
+lcd.print("  BILL CLEARED");
+delay(2000);
+lcd.clear();
+lcd.print("  WELCOME "); }
+if(compare(input,"5300A9D91437"))  {
+  i1=i2=i3=1;
+cost=0,count=0;
+ lcd.setCursor(0,0);
+lcd.print("I:");
+lcd.setCursor(2,0);
+lcd.print("X      ");
+lcd.setCursor(11,0);
+lcd.print("C:");
+lcd.setCursor(13,0);
+lcd.print("X");
+lcd.setCursor(0,1);
+lcd.print("N.I:");
+lcd.setCursor(4,1);
+lcd.print("X");
+lcd.setCursor(8,1);
+lcd.print("T.C:");
+lcd.setCursor(12,1);
+lcd.print("X");
+delay(1000);
+lcd.clear();
+lcd.print("  BILL CANCLED");
+delay(2000);
+lcd.clear();
+lcd.print("  WELCOME ");
+}}}
+int compare(char data1[],char readdataa[]) {
+  int comp_s=0,comp_n=0;
+  for(i=0;i<12;i++) {
+if(data1[i]==readdataa[i])
+comp_s=0;
+else
+comp_n=1;   }
+if(comp_n)
+return 0; 
+else
+return 1;
+}
